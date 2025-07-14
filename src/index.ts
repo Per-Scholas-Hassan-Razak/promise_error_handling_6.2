@@ -3,6 +3,8 @@ import {
   fetchProductReviews,
   fetchSalesReport,
 } from "./apiSimulator";
+import { DataError } from "./errors/DataErrors";
+import { NetworkError } from "./errors/NetworError";
 
 fetchProductCatalog()
   .then((products) => {
@@ -18,7 +20,13 @@ fetchProductCatalog()
           });
         })
         .catch((err) => {
-          console.log(`Could not fetch reviews for ${product.name}: ${err}`);
+          if (err instanceof DataError) {
+            console.error("Data Error:", err.message);
+          } else if (err instanceof NetworkError) {
+            console.error("Network Error:", err.message);
+          } else {
+            console.error("Unknown Error:", err);
+          }
         })
     );
 
@@ -33,9 +41,15 @@ fetchProductCatalog()
         console.log(`Average Price: $${report.averagePrice}`);
       })
       .catch((err) => {
-        console.log("Error fetching sales report:", err);
+         if (err instanceof DataError) {
+            console.error("Data Error:", err.message);
+          } else if (err instanceof NetworkError) {
+            console.error("Network Error:", err.message);
+          } else {
+            console.error("Unknown Error:", err);
+          }
       });
   })
   .finally(() => {
-    console.log("\nAll done.");
+    console.log("\nAll API requests were attempted.");
   });

@@ -1,3 +1,6 @@
+import { DataError } from "./errors/DataErrors";
+import { NetworkError } from "./errors/NetworError";
+
 interface Product {
   id: number;
   name: string;
@@ -18,9 +21,16 @@ interface SalesReport {
 export const fetchProductCatalog = (): Promise<Product[]> => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      const shouldFail = Math.random() < 0.2;
-      if (shouldFail) {
-        reject("Failed to fetch product catalog");
+      const networkError = Math.random() < 0.2;
+      const isBadData = Math.random() < 0.1;
+
+      if (isBadData) {
+        reject(
+          new DataError("Malformed product data: missing fields or wrong types")
+        );
+      }
+      else if (networkError) {
+        reject(new NetworkError("Failed to fetch product catalog"));
       } else {
         resolve([
           { id: 1, name: "Laptop", price: 1200 },
@@ -37,9 +47,13 @@ export const fetchProductReviews = (
 ): Promise<ProductReview[]> => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      const shouldFail = Math.random() < 0.3;
-      if (shouldFail) {
-        reject(`Failed to fetch reviews for product Id ${productId}`);
+      const networkError = Math.random() < 0.3;
+      if (networkError) {
+        reject(
+          new NetworkError(
+            `Failed to fetch reviews for product Id ${productId}`
+          )
+        );
       } else {
         resolve([
           { rating: 5, comment: "Excellent product!" },
@@ -54,9 +68,9 @@ export const fetchProductReviews = (
 export const fetchSalesReport = (): Promise<SalesReport> => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      const shouldFail = Math.random() < 0.25;
-      if (shouldFail) {
-        reject("Failed to fetch sales report");
+      const networkError = Math.random() < 0.25;
+      if (networkError) {
+        reject(new NetworkError("Failed to fetch sales report"));
       } else {
         resolve({
           totalSales: 5400,
